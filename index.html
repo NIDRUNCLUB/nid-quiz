@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NID RUN CLUB｜找出最適合你的跑步課程</title>
+<meta name="description" content="透過 NID 的課程性格測驗，找出最適合你的跑步訓練課程。" />
+<style>
+  :root{
+    --nid-yellow:#F5D11A;
+    --nid-yellow-soft:#FFF1A8;
+    --nid-black:#111111;
+    --nid-gray:#6b6b6b;
+    --nid-line:#ececec;
+    --nid-bg:#FAFAFA;
+    --radius:14px;
+    --shadow:0 8px 30px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--nid-bg);color:var(--nid-black);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    line-height:1.6;}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+
+  /* ---------- 版面 ---------- */
+  .wrap{max-width:720px;margin:0 auto;padding:24px 18px 60px;}
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px;background:var(--nid-black);color:#fff;
+    position:sticky;top:0;z-index:20;
+  }
+  header.top .logo{
+    font-weight:900;letter-spacing:2px;color:var(--nid-yellow);font-size:18px;
+  }
+  header.top .tag{font-size:12px;opacity:.75}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--nid-yellow);
+    border-radius:var(--radius);
+    padding:32px 24px;
+    margin-top:20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero h1{
+    font-size:28px;line-height:1.3;margin:0 0 10px;font-weight:900;
+  }
+  .hero p{margin:0;font-size:15px;color:#333}
+  .hero .badge{
+    display:inline-block;background:var(--nid-black);color:var(--nid-yellow);
+    padding:4px 10px;border-radius:999px;font-size:12px;letter-spacing:1px;
+    margin-bottom:12px;font-weight:700;
+  }
+  .hero .stripe{
+    position:absolute;right:-30px;bottom:-30px;width:160px;height:160px;
+    background:#fff2;border-radius:50%;
+  }
+
+  /* ---------- 進度條 ---------- */
+  .progress-wrap{margin:22px 0 6px;display:flex;align-items:center;gap:10px}
+  .progress-bar{flex:1;height:8px;background:#eee;border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--nid-yellow);width:0%;transition:width .3s}
+  .progress-text{font-size:12px;color:var(--nid-gray);white-space:nowrap}
+
+  /* ---------- 卡片 ---------- */
+  .card{
+    background:#fff;border-radius:var(--radius);padding:24px;
+    box-shadow:var(--shadow);margin-top:18px;
+  }
+  .card h2{margin:0 0 6px;font-size:20px;font-weight:900}
+  .card .sub{color:var(--nid-gray);font-size:14px;margin-bottom:18px}
+
+  /* ---------- 表單 ---------- */
+  label.field{display:block;margin-bottom:16px}
+  label.field > span{display:block;font-size:14px;font-weight:700;margin-bottom:6px}
+  .field input[type=text],
+  .field input[type=tel],
+  .field input[type=email],
+  .field input[type=number],
+  .field select{
+    width:100%;padding:12px 14px;border:1.5px solid var(--nid-line);
+    border-radius:10px;font-size:15px;background:#fff;
+    font-family:inherit;
+  }
+  .field input:focus,.field select:focus{outline:none;border-color:var(--nid-black)}
+
+  .radio-group,.chip-group{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    border:1.5px solid var(--nid-line);background:#fff;
+    padding:9px 14px;border-radius:999px;font-size:14px;cursor:pointer;
+    transition:all .15s;user-select:none;
+  }
+  .chip:hover{border-color:var(--nid-black)}
+  .chip.active{background:var(--nid-black);color:var(--nid-yellow);border-color:var(--nid-black)}
+
+  /* ---------- 按鈕 ---------- */
+  .btns{display:flex;gap:10px;margin-top:8px}
+  .btn{
+    flex:1;padding:14px;border-radius:12px;border:none;font-size:15px;
+    font-weight:800;cursor:pointer;font-family:inherit;transition:transform .08s;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--nid-black);color:var(--nid-yellow)}
+  .btn.primary:disabled{opacity:.35;cursor:not-allowed}
+  .btn.ghost{background:#fff;color:var(--nid-black);border:1.5px solid var(--nid-line)}
+
+  /* ---------- 測驗題 ---------- */
+  .q-num{
+    display:inline-block;background:var(--nid-yellow);color:var(--nid-black);
+    padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;margin-bottom:8px;
+  }
+  .q-title{font-size:19px;font-weight:900;margin:0 0 4px;line-height:1.4}
+  .q-hint{color:var(--nid-gray);font-size:13px;margin-bottom:18px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    border:1.5px solid var(--nid-line);background:#fff;padding:14px 16px;
+    border-radius:12px;cursor:pointer;font-size:15px;
+    display:flex;gap:12px;align-items:flex-start;transition:all .15s;
+  }
+  .opt:hover{border-color:var(--nid-black)}
+  .opt.active{border-color:var(--nid-black);background:var(--nid-yellow-soft)}
+  .opt .dot{
+    flex:0 0 20px;height:20px;width:20px;border-radius:50%;border:2px solid #ccc;
+    margin-top:2px;display:flex;align-items:center;justify-content:center;
+  }
+  .opt.active .dot{border-color:var(--nid-black);background:var(--nid-black)}
+  .opt.active .dot::after{content:"";width:8px;height:8px;background:var(--nid-yellow);border-radius:50%}
+  .opt .txt{flex:1}
+
+  /* ---------- 結果頁 ---------- */
+  .result-hero{
+    background:var(--nid-black);color:#fff;border-radius:var(--radius);
+    padding:28px 24px;margin-top:18px;
+  }
+  .result-hero .kicker{color:var(--nid-yellow);font-size:13px;letter-spacing:2px;font-weight:700}
+  .result-hero h2{font-size:30px;margin:6px 0 6px;font-weight:900;color:var(--nid-yellow)}
+  .result-hero p{margin:0;font-size:14px;opacity:.85}
+
+  .result-body{padding:22px 4px}
+  .result-body h3{margin:18px 0 8px;font-size:16px;font-weight:900}
+  .result-body ul{margin:0;padding-left:20px}
+  .result-body li{margin-bottom:4px}
+
+  .alt-card{
+    border:1.5px dashed var(--nid-line);border-radius:12px;
+    padding:16px;margin-top:12px;background:#fff;
+  }
+  .alt-card .lbl{font-size:12px;color:var(--nid-gray);letter-spacing:1px}
+  .alt-card .name{font-weight:900;font-size:16px;margin:4px 0 6px}
+  .alt-card p{margin:0;font-size:14px;color:#444}
+
+  .contact-box{
+    background:var(--nid-yellow-soft);border-radius:12px;padding:18px;
+    margin-top:18px;
+  }
+  .contact-box h4{margin:0 0 6px;font-size:15px;font-weight:900}
+  .contact-box p{margin:0 0 10px;font-size:13px;color:#555}
+  .contact-btn{
+    display:inline-block;background:#06C755;color:#fff;text-decoration:none;
+    padding:10px 18px;border-radius:999px;font-weight:800;font-size:14px;
+  }
+
+  .err{color:#c0392b;font-size:13px;margin-top:6px;display:none}
+  .err.show{display:block}
+
+  .screen{display:none;animation:fade .3s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .footer-note{
+    text-align:center;color:var(--nid-gray);font-size:12px;margin-top:28px;
+  }
+  .privacy{font-size:12px;color:var(--nid-gray);margin-top:10px}
+  .privacy a{text-decoration:underline}
+
+  @media(max-width:480px){
+    .hero{padding:26px 20px}
+    .hero h1{font-size:24px}
+    .card{padding:20px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="logo">NID RUN CLUB</div>
+  <div class="tag">課 程 性 格 測 驗</div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===== 1. 開場 ===== -->
+  <section class="screen active" id="screen-intro">
+    <div class="hero">
+      <span class="badge">2 分鐘小測驗</span>
+      <h1>找出最適合你的<br/>NID 跑步課程</h1>
+      <p>不知道要上哪一班？先花兩分鐘，讓我們依你的跑步狀態、目標與個性，幫你配對最對味的課程。</p>
+      <div class="stripe"></div>
+    </div>
+
+    <div class="card">
+      <h2>這份測驗會幫你</h2>
+      <div class="sub">
+        ✅ 從 5 種課程中找出最適合你的那一個<br/>
+        ✅ 第二推薦課程，讓你有更多選擇<br/>
+        ✅ 教練會依你的回答，給你更精準的建議
+      </div>
+      <button class="btn primary" onclick="goto('screen-basic')">開始測驗 →</button>
+      <div class="privacy">
+        填寫資料僅用於 NID 課程推薦與聯繫，不會做其他用途。
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== 2. 基本資料 ===== -->
+  <section class="screen" id="screen-basic">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="pb-basic" style="width:12%"></div></div>
+      <div class="progress-text">Step 1 / 3</div>
+    </div>
+
+    <div class="card">
+      <h2>先認識一下你 👋</h2>
+      <div class="sub">這些資料能幫教練更了解你，只要 30 秒。</div>
+
+      <label class="field">
+        <span>你的名字 / 暱稱 *</span>
+        <input type="text" id="f-name" placeholder="例如：小明" />
+      </label>
+
+      <label class="field">
+        <span>Email *</span>
+        <input type="email" id="f-email" placeholder="nid@example.com" />
+      </label>
+
+      <label class="field">
+        <span>LINE ID 或手機（選填）</span>
+        <input type="text" id="f-contact" placeholder="方便我們後續跟你聯繫" />
+      </label>
+
+      <label class="field">
+        <span>年齡 *</span>
+        <input type="number" id="f-age" placeholder="例如：30" min="10" max="99" />
+      </label>
+
+      <label class="field">
+        <span>性別 *</span>
+        <div class="chip-group" id="f-gender">
+          <div class="chip" data-val="女">女</div>
+          <div class="chip" data-val="男">男</div>
+          <div class="chip" data-val="其他/不方便透露">其他／不方便透露</div>
+        </div>
+      </label>
+
+      <label class="field">
+        <span>跑齡 *</span>
+        <div class="chip-group" id="f-years">
+          <div class="chip" data-val="完全沒跑過">完全沒跑過</div>
+          <div class="chip" data-val="0-6個月">剛開始 0–6 個月</div>
+          <div class="chip" data-val="0.5-1年">半年到 1 年</div>
+          <div class="chip" data-val="1-3年">1–3 年</div>
+          <div class="chip" data-val="3-5年">3–5 年</div>
+          <div class="chip" data-val="5年以上">5 年以上</div>
+        </div>
+      </label>
+
+      <label class="field">
+        <span>希望上課的地區 *</span>
+        <div class="chip-group" id="f-area">
+          <div class="chip" data-val="台北">台北</div>
+          <div class="chip" data-val="新北">新北</div>
+          <div class="chip" data-val="高雄">高雄</div>
+          <div class="chip" data-val="都可以">都可以 / 再看課表</div>
+        </div>
+      </label>
+
+      <div class="err" id="err-basic">請完整填寫必填欄位（標有 *）</div>
+
+      <div class="btns">
+        <button class="btn ghost" onclick="goto('screen-intro')">← 上一步</button>
+        <button class="btn primary" onclick="submitBasic()">下一步 →</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== 3. 測驗題 ===== -->
+  <section class="screen" id="screen-quiz">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="pb-quiz" style="width:30%"></div></div>
+      <div class="progress-text" id="pb-quiz-text">Step 2 / 3</div>
+    </div>
+
+    <div class="card" id="quiz-card">
+      <!-- JS 動態產生 -->
+    </div>
+  </section>
+
+
+  <!-- ===== 4. 結果 ===== -->
+  <section class="screen" id="screen-result">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+      <div class="progress-text">完成！</div>
+    </div>
+
+    <div class="result-hero">
+      <div class="kicker">YOUR BEST MATCH</div>
+      <h2 id="r-name">—</h2>
+      <p id="r-tagline">—</p>
+    </div>
+
+    <div class="result-body">
+      <h3>為什麼推薦這堂課給你？</h3>
+      <p id="r-reason" style="margin:0 0 10px">—</p>
+
+      <h3>這堂課的重點</h3>
+      <ul id="r-points"></ul>
+
+      <div class="alt-card" id="r-alt-wrap">
+        <div class="lbl">也可以考慮</div>
+        <div class="name" id="r-alt-name">—</div>
+        <p id="r-alt-desc">—</p>
+      </div>
+
+      <div class="contact-box">
+        <h4>想進一步了解或報名？</h4>
+        <p>你的資料已經送出，我們會主動聯絡你。若想直接詢問，歡迎加 NID LINE 官方帳號。</p>
+        <a class="contact-btn" href="https://lin.ee/p8VEaeU" target="_blank" rel="noopener">加入 LINE 詢問 →</a>
+      </div>
+
+      <div class="btns" style="margin-top:20px">
+        <button class="btn ghost" onclick="restart()">重新測驗</button>
+        <button class="btn primary" onclick="exportJSON()">下載我的測驗結果</button>
+      </div>
+
+      <div class="footer-note">
+        感謝你填寫，NID RUN CLUB 期待在課堂上見到你 🏃‍♀️🏃‍♂️
+      </div>
+    </div>
+  </section>
+
+</div>
+
+
+<script>
+/* =========================================================
+   課程資料
+   ========================================================= */
+const COURSES = {
+  elite: {
+    key:"elite",
+    name:"跑者養成班",
+    tagline:"零基礎 或 想重新打底的人，最適合從這裡開始",
+    reason:"你是完全沒跑過的新朋友，或曾經上過其他跑班但被嚇到、不敢再跑團體課。跑者養成班每期內容固定，從熱身、收操、馬克操、呼吸到配速一項一項慢慢教，就是要你把基礎練到反射動作。打穩之後，再進初階班或跑步班就不會害怕。",
+    points:[
+      "零基礎或「被跑班嚇到過」的人量身打造",
+      "從熱身、收操、馬克操、呼吸、配速一項一項教",
+      "每一期課程內容固定，重複練到紮實",
+      "讀完這期，進任何團體班都有底氣"
+    ]
+  },
+  intro: {
+    key:"intro",
+    name:"初階跑步班",
+    tagline:"系統化訓練，同學多半是新手，步調更舒服",
+    reason:"你已經有基礎跑步能力，也想開始系統化訓練、挑戰賽事或 PB。只是跟一群「已經在追成績」的強者一起練會有點壓力，初階班的課程架構跟跑步班一模一樣，但同學多半是新手，氛圍會讓你更自在。",
+    points:[
+      "跟跑步班一樣的系統化訓練架構",
+      "依能力分組，基礎 → 間歇 → 賽事銜接完整週期",
+      "同學以新手居多，壓力感較低",
+      "同樣能備戰路跑賽事、追 PB"
+    ]
+  },
+  run: {
+    key:"run",
+    name:"跑步班",
+    tagline:"系統化訓練，追 PB、挑戰賽事的人都在這裡",
+    reason:"你有基礎跑步能力、心態也準備好了，就想跟一群同樣在追成績的跑者一起訓練。跑步班是 NID 系統化訓練的主力課程，依能力分組，從基礎養成、間歇到賽事銜接完整規劃。",
+    points:[
+      "依能力分組，強度剛剛好",
+      "基礎 → 間歇 → 銜接賽事的完整週期",
+      "課表 + 每週三天自主訓練菜單",
+      "適合想突破 PB、完賽馬拉松的跑者"
+    ]
+  },
+  hyrox: {
+    key:"hyrox",
+    name:"Hyrox 訓練班",
+    tagline:"給想挑戰 Hyrox 賽事的你",
+    reason:"你的目標很明確 — 想挑戰 Hyrox 這項結合跑步與功能性體能的比賽。Hyrox 訓練班就是專門為這類賽事量身設計，把跑步、肌力、功能性動作整合進一套完整的專項訓練。",
+    points:[
+      "針對 Hyrox 賽事的專項訓練",
+      "跑步 + 肌力 + 功能性動作複合練習",
+      "體能、力量、心肺同時進步",
+      "適合以 Hyrox 比賽為目標的跑者"
+    ]
+  }
+};
+
+
+/* =========================================================
+   測驗題目（每題選項都為每個課程加權分數）
+   ========================================================= */
+const QUESTIONS = [
+  {
+    q:"最近一次「跑超過 3 公里不停」大概是什麼時候？",
+    hint:"老實回答就好，這題很重要",
+    opts:[
+      { t:"我從來沒跑過那麼遠，或走路居多",     s:{elite:4} },
+      { t:"這半年內有，但次數不多",              s:{intro:3, elite:1} },
+      { t:"每週都會跑，已經是生活的一部分",      s:{intro:2, run:2} },
+      { t:"每週跑超過 3 次，距離 5K 以上不費力", s:{run:3, hyrox:2} }
+    ]
+  },
+  {
+    q:"你過去參加跑班的經驗是？",
+    hint:"這題很關鍵",
+    opts:[
+      { t:"從來沒上過，是完全新手",                        s:{elite:3} },
+      { t:"上過別的跑班，但被嚇到、不敢再去了",            s:{elite:4} },
+      { t:"沒上過，但有自己亂跑，覺得該找人系統地教",     s:{intro:2, run:2} },
+      { t:"上過、感覺還好，想繼續找課程訓練",              s:{intro:2, run:2} },
+      { t:"上過、很喜歡，想找強度更高的課",                s:{run:3, hyrox:1} }
+    ]
+  },
+  {
+    q:"對於「熱身、收操、馬克操」這些基本動作，你的感覺是？",
+    hint:"這題看出你對基本功的熟悉度",
+    opts:[
+      { t:"沒聽過，或聽過但從沒認真做過",         s:{elite:4} },
+      { t:"大概知道，但不確定自己做得對不對",     s:{elite:3} },
+      { t:"會做，想繼續系統化練",                 s:{intro:2, run:2} },
+      { t:"會做，想找強度高一點的課",             s:{run:3} },
+      { t:"我的目標是 Hyrox 比賽",                s:{hyrox:4} }
+    ]
+  },
+  {
+    q:"你來上課最主要的目標是？",
+    hint:"選一個最接近的",
+    opts:[
+      { t:"先把最基本的動作和觀念學會",                    s:{elite:4} },
+      { t:"想系統化訓練，挑戰 10K 或半馬完賽",             s:{intro:3, run:2} },
+      { t:"想系統化訓練，突破 PB 或挑戰全馬",              s:{run:4} },
+      { t:"想挑戰 Hyrox 賽事",                              s:{hyrox:4} }
+    ]
+  },
+  {
+    q:"假設課堂上有人配速比你快很多，你會？",
+    hint:"這題很重要，看看你適合哪種氛圍",
+    opts:[
+      { t:"會很緊張,覺得自己拖累別人",                     s:{elite:2, intro:3} },
+      { t:"有點壓力,但希望同學跟自己差不多",               s:{intro:4} },
+      { t:"還好，只要教練會分組就 OK",                      s:{intro:2, run:2} },
+      { t:"不會，反而想被推一把",                          s:{run:4} }
+    ]
+  },
+  {
+    q:"你希望一起上課的同學，大部分是？",
+    hint:"關於團體氛圍",
+    opts:[
+      { t:"跟我一樣剛起步、或還在打底的人",                s:{elite:3, intro:2} },
+      { t:"有點基礎、但多半還是新手的跑友",                s:{intro:4} },
+      { t:"各種程度都有、有強者也有普通跑者",              s:{run:3} },
+      { t:"認真在追成績、挑戰賽事的跑者",                  s:{run:4} },
+      { t:"一起練 Hyrox 的夥伴",                            s:{hyrox:4} }
+    ]
+  },
+  {
+    q:"未來 6 個月，你希望自己做到什麼？",
+    hint:"先放膽想像",
+    opts:[
+      { t:"把跑步的基本動作做對、能輕鬆跑完 5K",           s:{elite:4} },
+      { t:"完賽 10K 或半馬，過程舒服不爆炸",               s:{intro:4} },
+      { t:"突破全馬 / 半馬 PB",                              s:{run:4} },
+      { t:"完賽一場 Hyrox 比賽",                            s:{hyrox:4} }
+    ]
+  }
+];
+
+
+
+/* =========================================================
+   狀態 & 流程控制
+   ========================================================= */
+const state = {
+  basic:{},
+  answers:[],       // 每題選的 index
+  scores:{},        // 課程 → 分數
+  result:null
+};
+let qIndex = 0;
+
+function goto(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ---------- chip group 單選綁定 ---------- */
+function bindChipGroup(id){
+  const box = document.getElementById(id);
+  box.addEventListener("click",e=>{
+    const chip = e.target.closest(".chip");
+    if(!chip) return;
+    box.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+  });
+}
+["f-gender","f-years","f-area"].forEach(bindChipGroup);
+
+/* ---------- Step 1 送出 ---------- */
+function submitBasic(){
+  const name  = document.getElementById("f-name").value.trim();
+  const email = document.getElementById("f-email").value.trim();
+  const contact = document.getElementById("f-contact").value.trim();
+  const age   = document.getElementById("f-age").value.trim();
+  const gender= document.querySelector("#f-gender .chip.active")?.dataset.val;
+  const years = document.querySelector("#f-years .chip.active")?.dataset.val;
+  const area  = document.querySelector("#f-area .chip.active")?.dataset.val;
+
+  const err = document.getElementById("err-basic");
+
+  // 必填檢查
+  if(!name || !email || !age || !gender || !years || !area){
+    err.textContent = "請完整填寫必填欄位（標有 *）";
+    err.classList.add("show");
+    return;
+  }
+  // Email 格式檢查
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!emailOk){
+    err.textContent = "Email 格式好像怪怪的，再確認一下？";
+    err.classList.add("show");
+    return;
+  }
+  err.classList.remove("show");
+
+  state.basic = { name, email, contact, age:Number(age), gender, years, area,
+                  submittedAt:new Date().toISOString() };
+
+  // 初始化測驗分數
+  Object.keys(COURSES).forEach(k=> state.scores[k]=0);
+  qIndex = 0;
+  renderQuestion();
+  goto("screen-quiz");
+}
+
+/* ---------- 測驗題渲染 ---------- */
+function renderQuestion(){
+  const q = QUESTIONS[qIndex];
+  const total = QUESTIONS.length;
+
+  // 進度條（測驗佔 30% → 95%）
+  const pct = 30 + Math.round((qIndex/total)*65);
+  document.getElementById("pb-quiz").style.width = pct+"%";
+  document.getElementById("pb-quiz-text").textContent = `Step 2 / 3 · 第 ${qIndex+1} / ${total} 題`;
+
+  const card = document.getElementById("quiz-card");
+  card.innerHTML = `
+    <div class="q-num">Q${qIndex+1} / ${total}</div>
+    <div class="q-title">${q.q}</div>
+    <div class="q-hint">${q.hint||""}</div>
+    <div class="options" id="opts"></div>
+    <div class="btns" style="margin-top:18px">
+      <button class="btn ghost" id="btn-prev" ${qIndex===0?"disabled":""}>← 上一題</button>
+      <button class="btn primary" id="btn-next" disabled>
+        ${qIndex===total-1 ? "看我的結果 →" : "下一題 →"}
+      </button>
+    </div>
+  `;
+
+  const optsBox = document.getElementById("opts");
+  q.opts.forEach((o,i)=>{
+    const el = document.createElement("div");
+    el.className = "opt";
+    el.innerHTML = `<div class="dot"></div><div class="txt">${o.t}</div>`;
+    el.addEventListener("click",()=>{
+      optsBox.querySelectorAll(".opt").forEach(x=>x.classList.remove("active"));
+      el.classList.add("active");
+      state.answers[qIndex] = i;
+      document.getElementById("btn-next").disabled = false;
+    });
+    // 還原已選
+    if(state.answers[qIndex]===i){ el.classList.add("active"); }
+    optsBox.appendChild(el);
+  });
+
+  if(state.answers[qIndex]!==undefined){
+    document.getElementById("btn-next").disabled = false;
+  }
+
+  document.getElementById("btn-prev").onclick = ()=>{
+    if(qIndex>0){ qIndex--; renderQuestion(); }
+  };
+  document.getElementById("btn-next").onclick = ()=>{
+    if(qIndex < QUESTIONS.length-1){
+      qIndex++;
+      renderQuestion();
+    } else {
+      computeResult();
+      renderResult();
+      submitToBackend();   // 預留送出 API
+      goto("screen-result");
+    }
+  };
+}
+
+/* ---------- 計分 ---------- */
+function computeResult(){
+  const scores = {};
+  Object.keys(COURSES).forEach(k=> scores[k]=0);
+
+  QUESTIONS.forEach((q,idx)=>{
+    const ansIdx = state.answers[idx];
+    if(ansIdx===undefined) return;
+    const s = q.opts[ansIdx].s;
+    for(const k in s){ scores[k]+=s[k]; }
+  });
+
+  // 跑齡微調
+  const y = state.basic.years;
+  if(y === "完全沒跑過"){
+    // 完全沒跑過 → 強烈推薦養成班
+    scores.elite += 4;
+    scores.run   = Math.max(0, scores.run - 2);
+    scores.hyrox = Math.max(0, scores.hyrox - 2);
+  }
+  if(y === "0-6個月"){
+    // 剛開始半年內 → 基礎還不夠，先養成或初階
+    scores.elite += 2;
+    scores.intro += 1;
+  }
+  if(y === "0.5-1年"){
+    // 半年到一年 → 初階合適
+    scores.intro += 1;
+  }
+  if(y === "1-3年"){
+    // 已經有一定基礎 → 初階或跑步班都可以，不需打地基
+    scores.elite = Math.max(0, scores.elite - 1);
+  }
+  if(y === "3-5年" || y === "5年以上"){
+    // 老跑者 → 偏向跑步班或 Hyrox，不需要養成班
+    scores.run   += 2;
+    scores.hyrox += 1;
+    scores.elite = Math.max(0, scores.elite - 3);
+    scores.intro = Math.max(0, scores.intro - 1);
+  }
+
+  state.scores = scores;
+
+  // 排序
+  const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  state.result = {
+    primary: sorted[0][0],
+    secondary: sorted[1][0],
+    sorted
+  };
+}
+
+/* ---------- 結果頁渲染 ---------- */
+function renderResult(){
+  const p = COURSES[state.result.primary];
+  const s = COURSES[state.result.secondary];
+  const primaryScore = state.scores[state.result.primary] || 0;
+  const secondaryScore = state.scores[state.result.secondary] || 0;
+
+  document.getElementById("r-name").textContent = p.name;
+  document.getElementById("r-tagline").textContent = p.tagline;
+  document.getElementById("r-reason").textContent = p.reason;
+  const ul = document.getElementById("r-points");
+  ul.innerHTML = p.points.map(x=>`<li>${x}</li>`).join("");
+
+  // 第二推薦：分數要有一定水準才顯示（至少是第一名的 40%，且 >= 5 分）
+  const altWrap = document.getElementById("r-alt-wrap");
+  if(secondaryScore >= 5 && secondaryScore >= primaryScore * 0.4){
+    altWrap.style.display = "block";
+    document.getElementById("r-alt-name").textContent = s.name;
+    document.getElementById("r-alt-desc").textContent = s.tagline;
+  } else {
+    altWrap.style.display = "none";
+  }
+}
+
+/* ---------- 產生簡單瀏覽器指紋（用於速率限制） ---------- */
+function getFingerprint(){
+  try{
+    var key = "nid_fp";
+    var fp = localStorage.getItem(key);
+    if(!fp){
+      fp = Date.now().toString(36) + Math.random().toString(36).slice(2,10);
+      localStorage.setItem(key, fp);
+    }
+    return fp;
+  }catch(e){
+    return "anon_" + Math.random().toString(36).slice(2,10);
+  }
+}
+
+/* ---------- 資料送出（預留給 NID 接後端） ---------- */
+function submitToBackend(){
+  const payload = {
+    secret: "nid-run-2026-xK9mQpL3",                 // ⚠️ 要跟 Apps Script 的 SECRET_KEY 一致
+    origin: window.location.origin,
+    fingerprint: getFingerprint(),
+    basic: state.basic,
+    answers: state.answers.map((ansIdx,i)=>({
+      question: QUESTIONS[i].q,
+      answer:   QUESTIONS[i].opts[ansIdx]?.t
+    })),
+    scores: state.scores,
+    result: {
+      primary:   COURSES[state.result.primary].name,
+      secondary: COURSES[state.result.secondary].name
+    },
+    submittedAt: new Date().toISOString()
+  };
+
+  // 1) 本地備份，避免資料掉
+  try{
+    const list = JSON.parse(localStorage.getItem("nid_quiz_submissions")||"[]");
+    list.push({...payload, secret:undefined}); // 本地備份不存密鑰
+    localStorage.setItem("nid_quiz_submissions", JSON.stringify(list));
+  }catch(e){}
+
+  // 2) 送到 Google Sheet（透過 Google Apps Script Web App）
+  const ENDPOINT = "https://script.google.com/macros/s/AKfycbzDoXumiPw-l5hoYw6cEfs1h2t9cy_KMa4PjBLRLtRoaJJdw_JhYMQN9uJ2Eyk5qHjW/exec";
+
+  if(ENDPOINT){
+    fetch(ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).catch(err => {
+      console.warn("[NID Quiz] submit failed", err);
+    });
+  }
+
+  console.log("[NID Quiz] submission", payload);
+}
+
+/* ---------- 下載結果（方便內部對帳） ---------- */
+function exportJSON(){
+  const payload = {
+    basic: state.basic,
+    answers: state.answers.map((a,i)=>({
+      question: QUESTIONS[i].q,
+      answer:   QUESTIONS[i].opts[a]?.t
+    })),
+    scores: state.scores,
+    result: {
+      primary:   COURSES[state.result.primary].name,
+      secondary: COURSES[state.result.secondary].name
+    }
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `NID_測驗結果_${state.basic.name || "user"}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function restart(){
+  state.basic = {};
+  state.answers = [];
+  state.scores = {};
+  state.result = null;
+  qIndex = 0;
+  document.querySelectorAll("input").forEach(i=> i.value="");
+  document.querySelectorAll(".chip.active").forEach(c=> c.classList.remove("active"));
+  goto("screen-intro");
+}
+</script>
+
+</body>
+</html>
